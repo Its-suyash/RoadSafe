@@ -23,8 +23,6 @@
 - [8. Repository Structure](#-8-repository-structure)
 - [9. Quickstart & Reproduction Guide](#-9-quickstart--reproduction-guide)
 - [10. Key Engineering Insights](#-10-key-engineering-insights)
-- [11. Future Scope](#-11-future-scope)
-- [12. License](#-12-license)
 
 ---
 
@@ -334,18 +332,8 @@ python evaluate.py --split test --benchmark
 3. **Decoupled Severity Engine**: Decoupling the severity estimation from the neural network weights into an interpretable heuristic module (`severity_estimator.py`) allows municipal civil engineers to adjust severity thresholds on the fly without retraining or re-annotating the model.
 4. **Graceful Fallbacks for Portable Code**: Scripts dynamically look for local sample data if the 96 MB training dataset is not unzipped, enabling seamless repository cloning and immediate verification by recruiters and collaborators.
 
----
 
-## 🔮 11. Future Scope & Extensions
-
-- **Temporal Tracking & Multi-Object Deduplication**: Integrate **ByteTrack** or **BoT-SORT** to track defects across consecutive video frames so that a single pothole captured over 20 frames is registered as one defect instance in the database.
-- **GPS Telemetry Integration & GIS Heatmaps**: Extract NMEA or Exif GPS coordinate metadata from dashcam files to project defect clusters onto OpenStreetMap / Mapbox layers.
-- **Edge Quantization**: Export to **TensorRT (FP16)** and **OpenVINO (INT8)** to achieve >30 FPS real-time throughput on low-power devices like the Raspberry Pi 5.
-
----
 
 
 ---
 
-## 📄 12. License
-This project is licensed under the [MIT License](LICENSE).
