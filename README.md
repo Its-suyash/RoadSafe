@@ -21,23 +21,22 @@
 ---
 
 ## 📌 Table of Contents
-- [1. Abstract & Motivation](#-1-abstract--motivation)
-- [2. Problem Formulation & Defect Taxonomy](#-2-problem-formulation--defect-taxonomy)
-- [3. End-to-End System Architecture](#-3-end-to-end-system-architecture)
-- [4. Dataset Engineering & Preprocessing](#-4-dataset-engineering--preprocessing)
-- [5. Model Architecture & Training Methodology](#-5-model-architecture--training-methodology)
-- [6. Mathematical Severity Assessment Framework](#-6-mathematical-severity-assessment-framework)
-- [7. Experimental Results & Performance Benchmarks](#-7-experimental-results--performance-benchmarks)
-- [8. Real-Time Video & Live Webcam Inference](#-8-real-time-video--live-webcam-inference)
-- [9. Repository Structure](#-9-repository-structure)
-- [10. Quickstart & Reproduction Guide](#-10-quickstart--reproduction-guide)
-- [11. Key Engineering Insights & Lessons Learned](#-11-key-engineering-insights--lessons-learned)
-- [12. Future Scope & Extensions](#-12-future-scope--extensions)
-- [13. References & Citation](#-13-references--citation)
+- [1. Overview & Motivation](#-1-overview--motivation)
+- [2. System Architecture](#-2-system-architecture)
+- [3. Dataset & Preprocessing](#-3-dataset--preprocessing)
+- [4. Model & Training Methodology](#-4-model--training-methodology)
+- [5. Geometric Severity Assessment](#-5-geometric-severity-assessment)
+- [6. Experimental Results & Benchmarks](#-6-experimental-results--benchmarks)
+- [7. Real-Time Video & Webcam Pipeline](#-7-real-time-video--webcam-pipeline)
+- [8. Repository Structure](#-8-repository-structure)
+- [9. Quickstart & How to Run](#-9-quickstart--how-to-run)
+- [10. Key Engineering Insights](#-10-key-engineering-insights)
+- [11. Future Scope](#-11-future-scope)
+- [12. References & License](#-12-references--license)
 
 ---
 
-## 📖 1. Abstract & Motivation
+## 📖 1. Overview & Motivation
 
 Municipal roadway networks form the backbone of national commerce and daily transit. However, timely maintenance of asphalt pavements remains a global engineering bottleneck. Traditional survey methods rely primarily on manual foot inspections or specialized inspection vehicles equipped with expensive LiDAR rigs (costing upwards of **$150,000 per unit**). These approaches are:
 1. **Labor-Intensive & Cost-Prohibitive**: Impractical for continuous, large-scale municipal monitoring.
@@ -53,30 +52,7 @@ Municipal roadway networks form the backbone of national commerce and daily tran
 
 ---
 
-## 🔍 2. Problem Formulation & Defect Taxonomy
-
-The objective is formulated as a simultaneous **multi-class object detection** and **heuristic severity regression** problem. Given an input RGB frame $I \in \mathbb{R}^{H \times W \times 3}$, the model predicts a set of $N$ defect instances:
-
-$$\mathcal{D} = \{ (c_i, p_i, \mathbf{b}_i, s_i) \}_{i=1}^N$$
-
-where:
-- $c_i \in \{0, 1, 2, 3\}$ is the predicted damage category.
-- $p_i \in [0, 1]$ is the prediction confidence score.
-- $\mathbf{b}_i = [x_1, y_1, x_2, y_2]$ represents the spatial bounding box coordinates.
-- $s_i \in \{\text{Low}, \text{Medium}, \text{High}\}$ is the deterministic severity level.
-
-### Defect Classes (Based on RDD2022 Benchmark)
-
-| Class Index | Defect Category | RDD2022 Code | Structural Risk & Real-World Mechanism |
-|:---:|:---|:---:|:---|
-| **0** | **Pothole** | `D40`, `D43`, `D44` | High immediate safety risk; causes vehicle suspension damage, blowouts, and accidents. |
-| **1** | **Longitudinal Crack** | `D00`, `D01` | Runs parallel to road centerline; caused by poor lane joint construction or heavy wheel-path stress. |
-| **2** | **Alligator Crack** | `D20` | Interconnected hexagonal fatigue cracks resembling reptile skin; indicates subgrade structural failure. |
-| **3** | **Transverse Crack** | `D10`, `D11` | Runs perpendicular to travel direction; caused by thermal shrinkage of asphalt during severe weather cycles. |
-
----
-
-## 🏗️ 3. End-to-End System Architecture
+## 🏗️ 2. System Architecture
 
 ```
                        ┌────────────────────────────────────────┐
@@ -126,14 +102,13 @@ where:
 
 ---
 
-## 📊 4. Dataset Engineering & Preprocessing
+## 📊 3. Dataset & Preprocessing
 
 The model is trained on the India subset of the **Crowdsensing-based Road Damage Detection Challenge (RDD2022)**. 
 
 ### Data Ingestion & Conversion Pipeline (`data_preparation.py`)
-1. **Format Standardization**: The raw dataset contains XML annotations adhering to the Pascal VOC format. We parse `<bndbox>` coordinates and transform them to YOLO normalized center-based coordinates:
-   $$x_{center} = \frac{x_{min} + x_{max}}{2 \cdot W}, \quad y_{center} = \frac{y_{min} + y_{max}}{2 \cdot H}, \quad w = \frac{x_{max} - x_{min}}{W}, \quad h = \frac{y_{max} - y_{min}}{H}$$
-2. **Class Mapping & Filtering**: Consolidated sub-variants (e.g., `D00` and `D01` $\to$ `LongitudinalCrack`; `D40`, `D43`, and `D44` $\to$ `Pothole`). Rare non-damage classes (such as `D50`) were omitted.
+1. **Format Standardization**: The raw dataset contains XML annotations adhering to the Pascal VOC format. The script parses bounding box coordinates and converts them into standardized YOLO normalized coordinates.
+2. **Class Mapping & Filtering**: Consolidated sub-variants into 4 primary damage categories (`Pothole`, `LongitudinalCrack`, `AlligatorCrack`, `TransverseCrack`). Rare non-damage classes were omitted.
 3. **Stratified Splitting**: Divided into **80% Training (1,224 images)**, **10% Validation (153 images)**, and **10% Test (153 images)**, stratified on the dominant defect class per image to ensure uniform distribution across splits.
 
 ```bash
@@ -143,14 +118,14 @@ python data_preparation.py --raw-dir /path/to/raw_rdd2022 --output-dir dataset
 
 ---
 
-## 🧠 5. Model Architecture & Training Methodology
+## 🧠 4. Model Architecture & Training Methodology
 
 ### Why YOLOv8-nano (`yolov8n`)?
-For an edge road safety audit system, inference latency and memory footprint are as critical as raw mean Average Precision (mAP). YOLOv8-nano delivers an optimal Pareto frontier:
-- **Parameter Count**: Only **3.01 Million parameters** (5.97 MB footprint).
-- **Decoupled Head**: Decouples classification and bounding box regression tasks, accelerating convergence.
-- **Anchor-Free Architecture**: Predicts the center of objects directly, handling varied defect aspect ratios without hand-tuned anchor box priors.
-- **Loss Formulation**: Complete IoU Loss ($\mathcal{L}_{CIoU}$) + Distribution Focal Loss ($\mathcal{L}_{DFL}$) for box regression, and Binary Cross-Entropy ($\mathcal{L}_{BCE}$) for multi-class classification.
+For an edge road safety audit system, inference latency and memory footprint are as critical as detection accuracy. YOLOv8-nano delivers an optimal balance:
+- **Lightweight Footprint**: Only **3.01 Million parameters** (5.97 MB file size).
+- **Decoupled Head**: Separates classification and bounding box tasks for faster learning.
+- **Anchor-Free Detection**: Predicts defect centers directly, easily handling long cracks and wide potholes of any shape.
+- **Tightly Fitted Bounding Boxes**: Uses modern IoU loss functions to tightly align bounding boxes around irregular asphalt defects.
 
 ### Domain-Specific Hyperparameters & Augmentations (`train.py`)
 
@@ -168,40 +143,30 @@ flipud          = 0.0              # DISABLED (Critical Domain Observation)
 ```
 
 > 💡 **Key Computer Vision Insight: `flipud = 0.0`**  
-> In generic object detection (e.g., COCO), vertical flip augmentation is frequently enabled. However, in vehicular dashcam and road inspection imagery, **roads are physically constrained to the ground plane**. Flipping an image vertically creates an impossible physical scenario (the sky on the bottom and the road on top), which actively confuses spatial feature representation in early convolutional layers. Setting `flipud=0.0` eliminates this orientation noise.
+> In generic object detection (like COCO), vertical flip augmentation is common. However, in dashcam road footage, **roads are always on the bottom and sky is on top**. Flipping images upside-down creates an impossible physical scenario that confuses the model. Disabling vertical flip (`flipud=0.0`) eliminated this orientation noise and improved training stability.
 
 ---
 
-## 📐 6. Mathematical Severity Assessment Framework
+## 📐 5. Geometric Severity Assessment
 
-Standard object detectors output bounding boxes without context on whether a defect constitutes an emergency. RoadSafe couples detection with a **domain-grounded geometric severity engine** (`severity_estimator.py`).
+Standard object detectors only draw boxes around damage. RoadSafe adds an engineering severity estimator (`severity_estimator.py`) that categorizes each defect into **Low**, **Medium**, or **High** risk based on real physical road dimensions:
 
-Each defect category is evaluated against a class-specific geometric metric normalized against frame dimensions:
+- **Potholes & Alligator Cracks**: Evaluated by the **surface area covered** relative to the overall camera view.
+- **Longitudinal Cracks**: Evaluated by **vertical length** along the travel lane.
+- **Transverse Cracks**: Evaluated by **horizontal width** spanning across the roadway.
 
-### 1. Potholes & Alligator Cracks (Area Occupancy Ratio)
-Potholes and alligator cracking represent surface area degradation. The metric measures the surface footprint:
-$$R_{area} = \frac{(x_2 - x_1) \cdot (y_2 - y_1)}{W_{img} \cdot H_{img}}$$
+### Severity Threshold Criteria
 
-### 2. Longitudinal Cracks (Vertical Propagation Ratio)
-Longitudinal cracks propagate along the line of travel. The metric evaluates vertical extent:
-$$R_{height} = \frac{y_2 - y_1}{H_{img}}$$
-
-### 3. Transverse Cracks (Horizontal Lane Span Ratio)
-Transverse cracks cut across the roadway. The metric assesses lane width penetration:
-$$R_{width} = \frac{x_2 - x_1}{W_{img}}$$
-
-### Piecewise Severity Threshold Matrix
-
-| Defect Class | Governing Metric | Low Severity (🟢) | Medium Severity (🟠) | High Severity (🔴) |
-|:---|:---:|:---:|:---:|:---:|
-| **Pothole** | $R_{area}$ | $R_{area} < 2\%$ | $2\% \le R_{area} \le 5\%$ | $R_{area} > 5\%$ |
-| **Alligator Crack** | $R_{area}$ | $R_{area} < 3\%$ | $3\% \le R_{area} \le 8\%$ | $R_{area} > 8\%$ |
-| **Longitudinal Crack** | $R_{height}$ | $R_{height} < 10\%$ | $10\% \le R_{height} \le 25\%$ | $R_{height} > 25\%$ |
-| **Transverse Crack** | $R_{width}$ | $R_{width} < 10\%$ | $10\% \le R_{width} \le 25\%$ | $R_{width} > 25\%$ |
+| Defect Class | Measurement Focus | Low Severity (🟢) | Medium Severity (🟠) | High Severity (🔴) |
+|:---|:---|:---:|:---:|:---:|
+| **Pothole** | Surface Area Covered | < 2% of frame | 2% – 5% | > 5% (Emergency hazard) |
+| **Alligator Crack** | Surface Area Covered | < 3% of frame | 3% – 8% | > 8% (Subgrade failure) |
+| **Longitudinal Crack** | Vertical Length | < 10% of frame height | 10% – 25% | > 25% (Joint separation) |
+| **Transverse Crack** | Horizontal Width | < 10% of frame width | 10% – 25% | > 25% (Full lane crack) |
 
 ---
 
-## 📈 7. Experimental Results & Performance Benchmarks
+## 📈 6. Experimental Results & Benchmarks
 
 ### Quantitative Detection Metrics on Held-Out Test Set (153 Images)
 
@@ -242,7 +207,7 @@ Evaluated at IoU threshold = 0.50 and confidence threshold = 0.25:
 
 ---
 
-## 🎥 8. Real-Time Video & Live Webcam Inference
+## 🎥 7. Real-Time Video & Webcam Pipeline
 
 RoadSafe supports video files (`.mp4`, `.avi`, `.mov`) and live camera streams with a dynamic HUD overlay:
 
@@ -265,7 +230,7 @@ python inference.py --webcam --output results/
 
 ---
 
-## 📁 9. Repository Structure
+## 📁 8. Repository Structure
 
 ```
 RoadSafe/
@@ -357,25 +322,25 @@ streamlit run app.py
 # 2. Run quickstart CLI demo:
 python demo.py
 
-# 2. Run inference on a specific image:
+# 3. Run inference on a specific image:
 python inference.py --image sample_images/India_000017.jpg --output results/
 
-# 3. Run inference on an entire directory:
+# 4. Run inference on an entire directory:
 python inference.py --image-dir sample_images/ --output results/
 
-# 4. Run inference on a video:
+# 5. Run inference on a video:
 python inference.py --video "demo video/mixkit-potholes-in-a-rural-road-25208-hd-ready.mp4" --output results/
 
-# 5. Run live webcam inference:
+# 6. Run live webcam inference:
 python inference.py --webcam 0 --output results/
 
-# 6. Run benchmark evaluation:
+# 7. Run benchmark evaluation:
 python evaluate.py --split test --benchmark
 ```
 
 ---
 
-## 💡 11. Key Engineering Insights & Lessons Learned
+## 💡 10. Key Engineering Insights & Lessons Learned
 
 1. **Orientation Matters in Physical Domains**: Disabling vertical flip (`flipud=0.0`) is non-negotiable for dashcam vision. Treating aerial or satellite data differently from forward-facing vehicular perspectives is a foundational domain adaptation.
 2. **Defensive Pipeline Engineering**: Production vision systems must never terminate abruptly due to a single malformed, corrupt, or unreadable frame in a multi-thousand image batch. Wrapping frame processing in individual try-except handlers with skipped-frame audit telemetry ensures high availability.
@@ -384,7 +349,7 @@ python evaluate.py --split test --benchmark
 
 ---
 
-## 🔮 12. Future Scope & Extensions
+## 🔮 11. Future Scope & Extensions
 
 - **Temporal Tracking & Multi-Object Deduplication**: Integrate **ByteTrack** or **BoT-SORT** to track defects across consecutive video frames so that a single pothole captured over 20 frames is registered as one defect instance in the database.
 - **GPS Telemetry Integration & GIS Heatmaps**: Extract NMEA or Exif GPS coordinate metadata from dashcam files to project defect clusters onto OpenStreetMap / Mapbox layers.
@@ -392,7 +357,7 @@ python evaluate.py --split test --benchmark
 
 ---
 
-## 📚 13. References & Citation
+## 📚 12. References & License
 
 1. **RDD2022 Benchmark**:
    ```bibtex

@@ -346,11 +346,10 @@ def main():
                 video_path = tfile.name
 
         if video_path is not None:
-            max_frames = st.slider("Frame Limit (Processing Budget)", min_value=30, max_value=300, value=75, step=15)
-            if st.button("Start Dashcam Analysis", type="primary"):
+            if st.button("Start Full Video Analysis", type="primary"):
                 cap = cv2.VideoCapture(video_path)
                 total_video_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-                limit = min(max_frames, total_video_frames) if total_video_frames > 0 else max_frames
+                fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
 
                 progress_bar = st.progress(0)
                 status_text = st.empty()
@@ -359,7 +358,7 @@ def main():
                 frame_idx = 0
                 total_detected = 0
 
-                while cap.isOpened() and frame_idx < limit:
+                while cap.isOpened():
                     ret, frame = cap.read()
                     if not ret:
                         break
@@ -368,12 +367,14 @@ def main():
                     res, ann = process_image(frame, model, severity_est, conf_threshold, iou_threshold, selected_device)
                     total_detected += res["num_detections"]
 
-                    frame_placeholder.image(ann, caption=f"Frame {frame_idx}/{limit} | Active Detections: {res['num_detections']}", use_container_width=True)
-                    progress_bar.progress(frame_idx / limit)
-                    status_text.text(f"Auditing frame {frame_idx}/{limit}...")
+                    progress_pct = (frame_idx / total_video_frames) if total_video_frames > 0 else 0.5
+                    progress_bar.progress(min(progress_pct, 1.0))
+                    status_text.text(f"Auditing frame {frame_idx} of {total_video_frames} | Damage found so far: {total_detected}")
+                    frame_placeholder.image(ann, caption=f"Frame {frame_idx}/{total_video_frames} | Current Frame Detections: {res['num_detections']}", use_container_width=True)
 
                 cap.release()
-                status_text.success(f"Audit Complete: Processed {frame_idx} frames. Total damage instances flagged: {total_detected}")
+                progress_bar.progress(1.0)
+                status_text.success(f"Audit Complete! Processed full video ({frame_idx} frames). Total damage instances flagged: {total_detected}")
 
     # ── Tab 3: Camera Capture ─────────────────────────────────
     with tab_cam:
