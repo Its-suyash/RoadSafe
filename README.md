@@ -1,23 +1,15 @@
 # 🛣️ RoadSafe: Deep Learning-Based Road Damage Detection & Severity Assessment System
 
 > **A Lightweight, Real-Time Edge Vision Pipeline for Automated Road Surface Auditing**  
-> *Developed with YOLOv8-nano, OpenCV, and Domain-Specific Geometric Severity Heuristics on the RDD2022 India Dataset*
+> *Developed with YOLOv8-nano, OpenCV on the RDD2022 India Dataset*
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?style=flat&logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-00FFFF?style=flat)](https://github.com/ultralytics/ultralytics)
-[![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-5C3EE8?style=flat&logo=opencv&logoColor=white)](https://opencv.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Device: CPU & CUDA](https://img.shields.io/badge/Hardware-CPU%20%7C%20CUDA%20Edge-success)](https://developer.nvidia.com/cuda-toolkit)
+
 
 ---
 
-## 🖥️ Minimalist Web Application Interface
+## 🖥️ Web Application Interface
 
 ![RoadSafe Minimalist Interface](assets/app_interface.png)
-
-> **Figure 1**: RoadSafe Vercel/Apple-inspired minimalist interface running on local hardware. Features real-time defect tallying (Total Defects, Potholes, Cracks, High-Risk Hazards), sub-170ms CPU inference latency telemetry, side-by-side original vs. detection overlay, and 1-click evidence export.
-
 ---
 
 ## 📌 Table of Contents
@@ -111,10 +103,6 @@ The model is trained on the India subset of the **Crowdsensing-based Road Damage
 2. **Class Mapping & Filtering**: Consolidated sub-variants into 4 primary damage categories (`Pothole`, `LongitudinalCrack`, `AlligatorCrack`, `TransverseCrack`). Rare non-damage classes were omitted.
 3. **Stratified Splitting**: Divided into **80% Training (1,224 images)**, **10% Validation (153 images)**, and **10% Test (153 images)**, stratified on the dominant defect class per image to ensure uniform distribution across splits.
 
-```bash
-# To regenerate dataset from raw unzipped RDD2022 data:
-python data_preparation.py --raw-dir /path/to/raw_rdd2022 --output-dir dataset
-```
 
 ---
 
@@ -285,7 +273,6 @@ RoadSafe/
 
 ### Prerequisites
 - Python 3.10, 3.11, 3.12, 3.13, or 3.14
-- CUDA-enabled GPU (Optional; CPU execution is fully supported out of the box)
 
 ### Installation
 
@@ -357,27 +344,6 @@ python evaluate.py --split test --benchmark
 
 ---
 
-## 📚 12. References & License
-
-1. **RDD2022 Benchmark**:
-   ```bibtex
-   @article{arya2022crowdsensing,
-     title={Crowdsensing-based road damage detection challenge 2022},
-     author={Arya, Deeksha and Maeda, Hiroya and Ghosh, Sanjay Kumar and Toshniwal, Durga and Sekimoto, Yoshihide},
-     journal={IEEE Big Data},
-     year={2022}
-   }
-   ```
-2. **Ultralytics YOLOv8**:
-   ```bibtex
-   @software{yolov8_ultralytics,
-     author = {Glenn Jocher and Ayush Chaurasia and Jing Qiu},
-     title = {Ultralytics YOLOv8},
-     version = {8.0.0},
-     year = {2023},
-     url = {https://github.com/ultralytics/ultralytics}
-   }
-   ```
 
 ---
 
