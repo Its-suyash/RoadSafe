@@ -1,0 +1,14 @@
+{
+  "model": "weights\\best.pt",
+  "model_size_mb": 5.97,
+  "split": "test",
+  "n_images": 153,
+  "conf_threshold": 0.25,
+  "mAP50": 0.286297573617315,
+  "mAP50_95": 0.10381607717461713,
+  "per_class_ap50": {
+    "Pothole": 0.387,
+    "LongitudinalCrack": 0.0724,
+    "AlligatorCrack": 0.3995
+  }
+}

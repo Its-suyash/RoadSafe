@@ -1,0 +1,74 @@
+================================================================================
+  ROADSAFE: ROAD DAMAGE DETECTION & SEVERITY ASSESSMENT
+  Plug & Play Instructions for Another Computer
+================================================================================
+
+This folder is completely self-contained. It contains:
+  • The pre-trained YOLOv8-nano model (weights/best.pt)
+  • Test road images (dataset/test/images/)
+  • Complete detection & severity estimation codebase
+  • Pre-computed evaluation metrics and visual charts
+
+--------------------------------------------------------------------------------
+OPTION A: QUICKEST WAY (WINDOWS DOUBLE-CLICK)
+--------------------------------------------------------------------------------
+1. Copy the entire 'RoadSafe' folder from the USB drive to the target computer
+   (e.g., onto the Desktop or C:\ drive).
+
+2. If Python packages are not installed on that computer:
+   -> Double-click: 3_INSTALL_DEPENDENCIES.bat
+
+3. To see the model in action instantly:
+   -> Double-click: 1_RUN_DEMO.bat
+   (Runs detection and severity assessment on a test road image in <2 seconds)
+
+4. To run full batch inference on all test images:
+   -> Double-click: 2_RUN_INFERENCE.bat
+   (Annotated images and results.json will be saved inside results/)
+
+5. To run detection on a video file or live webcam:
+   -> Double-click: 4_RUN_VIDEO.bat
+   (Choose video file or webcam mode from the interactive menu)
+
+
+--------------------------------------------------------------------------------
+OPTION B: COMMAND LINE (WINDOWS / MAC / LINUX)
+--------------------------------------------------------------------------------
+Open terminal in the RoadSafe folder and run:
+
+1. Install dependencies:
+   pip install -r requirements.txt
+
+2. Run 1-click quickstart demo:
+   python demo.py
+
+3. Run detection on any custom image:
+   python inference.py --image dataset/test/images/India_009605.jpg
+
+4. Run detection specifically forcing CPU (if the computer has no GPU):
+   python inference.py --image dataset/test/images/India_009605.jpg --device cpu
+
+5. Run detection on a dashcam video file:
+   python inference.py --video path/to/dashcam.mp4 --output results/
+
+6. Run live webcam detection (press 'q' in the window to stop):
+   python inference.py --webcam --output results/
+
+7. Evaluate model on test set:
+   python evaluate.py --split test --save-plots --benchmark
+
+8. Generate visual comparison charts:
+   python visualize.py --results results/results.json --image-dir results/ --show-grid 9 --class-distribution --severity-distribution
+
+
+--------------------------------------------------------------------------------
+MINIMUM SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------------
+• Python: 3.10, 3.11, 3.12, 3.13, or 3.14
+• GPU: Optional! Works on both NVIDIA GPUs (CUDA) and standard non-GPU CPUs.
+• Webcam: Optional. Only needed for live detection mode.
+• Storage: Folder size is ~245 MB.
+
+For full technical details, business value proposition, and case competition
+analysis, see README.md.
+================================================================================

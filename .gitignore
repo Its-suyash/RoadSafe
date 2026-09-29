@@ -1,0 +1,50 @@
+# ==============================================================================
+# RoadSafe .gitignore
+# Clean repository rules for Computer Science / Engineering portfolio
+# ==============================================================================
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large Datasets (Excluded from Git — download instructions in README)
+dataset/
+train/
+
+# Dataset label caches
+*.cache
+dataset/train/labels.cache
+dataset/val/labels.cache
+dataset/test/labels.cache
+
+# Duplicate weights in runs/ (primary production weights are kept in weights/best.pt)
+runs/detect/*/weights/
+runs/detect/*_old*/
+runs/detect/val*/
+
+# Runtime inference output (reproducible from demo/inference scripts)
+results/*
+!results/.gitkeep
+
+# Temporary & Log files
+*.tmp
+*.log
+*.swp
+*.swo
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini

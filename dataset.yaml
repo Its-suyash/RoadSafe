@@ -1,0 +1,17 @@
+# Road Damage Detection Dataset Configuration
+# India subset of RDD2022 — 4-class object detection
+
+path: ./dataset
+train: train/images
+val: val/images
+test: test/images
+
+# Number of classes
+nc: 4
+
+# Class names
+names:
+  0: Pothole
+  1: LongitudinalCrack
+  2: AlligatorCrack
+  3: TransverseCrack
