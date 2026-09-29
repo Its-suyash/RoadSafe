@@ -21,10 +21,10 @@
 - [6. Experimental Results & Benchmarks](#-6-experimental-results--benchmarks)
 - [7. Real-Time Video & Webcam Pipeline](#-7-real-time-video--webcam-pipeline)
 - [8. Repository Structure](#-8-repository-structure)
-- [9. Quickstart & How to Run](#-9-quickstart--how-to-run)
+- [9. Quickstart & Reproduction Guide](#-9-quickstart--reproduction-guide)
 - [10. Key Engineering Insights](#-10-key-engineering-insights)
 - [11. Future Scope](#-11-future-scope)
-- [12. References & License](#-12-references--license)
+- [12. License](#-12-license)
 
 ---
 
@@ -269,7 +269,7 @@ RoadSafe/
 
 ---
 
-## 🚀 10. Quickstart & Reproduction Guide
+## 🚀 9. Quickstart & Reproduction Guide
 
 ### Prerequisites
 - Python 3.10, 3.11, 3.12, 3.13, or 3.14
@@ -278,7 +278,7 @@ RoadSafe/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/RoadSafe.git
+git clone https://github.com/Its-suyash/RoadSafe.git
 cd RoadSafe
 
 # Create and activate a virtual environment (recommended)
@@ -347,5 +347,5 @@ python evaluate.py --split test --benchmark
 
 ---
 
-## 📄 License
+## 📄 12. License
 This project is licensed under the [MIT License](LICENSE).

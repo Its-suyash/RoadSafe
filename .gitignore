@@ -11,6 +11,7 @@ __pycache__/
 # Large Datasets (Excluded from Git — download instructions in README)
 dataset/
 train/
+yolov8n.pt
 
 # Dataset label caches
 *.cache
