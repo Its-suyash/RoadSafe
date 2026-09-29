@@ -12,6 +12,14 @@
 
 ---
 
+## 🖥️ Minimalist Web Application Interface
+
+![RoadSafe Minimalist Interface](assets/app_interface.png)
+
+> **Figure 1**: RoadSafe Vercel/Apple-inspired minimalist interface running on local hardware. Features real-time defect tallying (Total Defects, Potholes, Cracks, High-Risk Hazards), sub-170ms CPU inference latency telemetry, side-by-side original vs. detection overlay, and 1-click evidence export.
+
+---
+
 ## 📌 Table of Contents
 - [1. Abstract & Motivation](#-1-abstract--motivation)
 - [2. Problem Formulation & Defect Taxonomy](#-2-problem-formulation--defect-taxonomy)
@@ -284,10 +292,15 @@ RoadSafe/
 │   ├── confusion_matrix.png        # Confusion matrix
 │   ├── BoxPR_curve.png             # Precision-Recall curve
 │   └── BoxF1_curve.png             # F1-Confidence curve
+├── assets/                         # Application screenshots & interface UI assets
+│   ├── app_interface.png           # Showcase screenshot of minimalist web app
+│   └── app_full.png                # Full-page high-resolution audit view
+├── RUN_APP.bat                     # 1-Click launcher: Start Minimalist Web Application
 ├── 1_RUN_DEMO.bat                  # 1-Click quickstart demo (Windows)
 ├── 2_RUN_INFERENCE.bat             # 1-Click batch inference on sample/test images
 ├── 3_INSTALL_DEPENDENCIES.bat      # 1-Click pip installer
 ├── 4_RUN_VIDEO.bat                 # 1-Click video & webcam interactive runner
+├── app.py                          # Minimalist Streamlit web application
 ├── demo.py                         # Clean quickstart demonstration script
 ├── inference.py                    # Multi-source inference engine (Image, Dir, Video, Webcam)
 ├── severity_estimator.py           # Geometric severity heuristic calculation engine
@@ -329,7 +342,8 @@ pip install -r requirements.txt
 
 ### Windows 1-Click Launchers (Zero-CLI)
 If using Windows, you can double-click the `.bat` files directly:
-- **`1_RUN_DEMO.bat`**: Runs instant detection on sample image (`sample_images/India_009605.jpg`).
+- **`RUN_APP.bat`** *(Recommended)*: Launches the interactive minimalist web application in your default browser.
+- **`1_RUN_DEMO.bat`**: Runs instant CLI detection on sample image (`sample_images/India_009605.jpg`).
 - **`2_RUN_INFERENCE.bat`**: Runs batch detection and exports results to `results/`.
 - **`3_INSTALL_DEPENDENCIES.bat`**: Automatically checks Python and installs `requirements.txt`.
 - **`4_RUN_VIDEO.bat`**: Interactive menu to run on sample video, custom video, or webcam.
@@ -337,7 +351,10 @@ If using Windows, you can double-click the `.bat` files directly:
 ### Command-Line Usage
 
 ```bash
-# 1. Run quickstart demo:
+# 1. Launch the interactive web app:
+streamlit run app.py
+
+# 2. Run quickstart CLI demo:
 python demo.py
 
 # 2. Run inference on a specific image:
