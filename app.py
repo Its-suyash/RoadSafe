@@ -196,20 +196,22 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Sidebar Controls ─────────────────────────────────────
-    st.sidebar.markdown("**Engine Settings**")
-    conf_threshold = st.sidebar.slider("Confidence Threshold", min_value=0.10, max_value=0.90, value=0.25, step=0.05)
-    iou_threshold = st.sidebar.slider("IoU Threshold (NMS)", min_value=0.20, max_value=0.80, value=0.45, step=0.05)
+    # Fixed calibrated thresholds (cleaner, distraction-free interface)
+    conf_threshold = 0.25
+    iou_threshold = 0.45
 
+    # ── Sidebar Controls ─────────────────────────────────────
+    st.sidebar.markdown("**System Profile**")
     device_options = ["cpu", "0"] if torch.cuda.is_available() else ["cpu"]
     selected_device = st.sidebar.selectbox("Compute Hardware", device_options, index=0)
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
-    <div style="font-size: 0.8rem; color: #71717A;">
-        <strong>Model:</strong> YOLOv8-nano (3.0M params)<br>
+    <div style="font-size: 0.8rem; color: #71717A; line-height: 1.6;">
+        <strong>Model:</strong> YOLOv8-nano<br>
+        <strong>Parameters:</strong> 3.0M<br>
         <strong>Footprint:</strong> 5.97 MB<br>
-        <strong>Dataset:</strong> RDD2022 India
+        <strong>Benchmark:</strong> RDD2022 India
     </div>
     """, unsafe_allow_html=True)
 
